@@ -1,27 +1,32 @@
-const joi = require("joi");
+const Joi = require("joi");
 
 module.exports = {
     // User signup validation.
-    userSignUpSchema: joi.object({
-        name: joi.string().required(),
-        email: joi.string().email().required(),
-        password: joi.string().required(),
-        confirmPassword: joi.string().required(),
+    userSignUpSchema: Joi.object({
+        email: Joi.string().email().required(),
+        role: Joi.string().required().valid("farmer", "agent"),
+        agent: Joi.when("role", {
+            is: "farmer",
+            then: Joi.string().required(),
+            otherwise: Joi.string().allow("", null),
+        }),
+        password: Joi.string().required(),
+        confirmPassword: Joi.string().required(),
     }),
 
     // User login validation.
-    userSignInSchema: joi.object({
-        email: joi.string().email().required(),
-        password: joi.string().required(),
+    userSignInSchema: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
     }),
 
-    // Update user
-    updateMeSchema: joi.object({
-        name: joi.string().required(),
-        email: joi.string().email().required(),
-        phoneNumber: joi.number(),
-        admissionNumber: joi.number(),
-        admissionYear: joi.number(),
-        avatar: joi.string().allow("", null),
+    // Update Farmer
+    updateUserSchema: Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phoneNumber: Joi.number(),
+        gender: Joi.string().valid("male", "female", "other"),
+        state: Joi.string().allow("", null),
+        area: Joi.string().allow("", null),
     }),
 };

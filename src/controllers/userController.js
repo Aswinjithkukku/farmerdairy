@@ -3,9 +3,9 @@ const catchAsyncError = require("../utils/catchAsyncError");
 const User = require("../models/user.model");
 const AppError = require("../utils/appError");
 const {
-    userSignUpSchema,
     userSignInSchema,
-    updateMeSchema,
+    userSignUpSchema,
+    updateUserSchema,
 } = require("../validations/user.schema");
 
 const signToken = (id) => {
@@ -30,7 +30,7 @@ const createSendCookie = (user, statusCode, res) => {
 };
 
 module.exports = {
-    doSignUp: catchAsyncError(async (req, res, next) => {
+    doUserSignup: catchAsyncError(async (req, res, next) => {
         const { _, error } = userSignUpSchema.validate(req.body);
 
         if (error) {
@@ -59,7 +59,7 @@ module.exports = {
             );
         }
 
-        const user = await User.findOne({ email: email }).select("+password");
+        let user = await User.findOne({ email: email }).select("+password");
 
         const isCorrect = await user.checkPasswordCorrect(password, user.password);
 
@@ -71,7 +71,11 @@ module.exports = {
     }),
 
     myAccount: catchAsyncError(async (req, res, next) => {
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id).populate("agent");
+
+        if (!user) {
+            return next(new AppError("Sorry no user found", 403));
+        }
 
         res.status(200).json({
             status: "success",
@@ -79,8 +83,17 @@ module.exports = {
         });
     }),
 
-    updateMe: catchAsyncError(async (req, res, next) => {
-        const { _, error } = updateMeSchema.validate(req.body);
+    listAgents: catchAsyncError(async (req, res, next) => {
+        const agents = await User.find({ role: "agent" }).select("name email gender");
+
+        res.status(200).json({
+            status: "success",
+            data: agents,
+        });
+    }),
+
+    updateUser: catchAsyncError(async (req, res, next) => {
+        const { _, error } = updateUserSchema.validate(req.body);
 
         if (error) {
             return next(
@@ -88,39 +101,16 @@ module.exports = {
             );
         }
 
-        let avatarImg;
-        if (req.file?.path) {
-            avatarImg = "/" + req.file.path.replace(/\\/g, "/");
-        }
-
-        const user = await User.findByIdAndUpdate(
-            req.user._id,
-            { ...req.body, avatar: avatarImg },
-            {
-                new: true,
-                runValidators: true,
-            }
-        );
+        const user = await User.findByIdAndUpdate(req.user._id, req.body, {
+            new: true,
+            runValidators: true,
+        })
+            .select("-__v -createdAt -updatedAt")
+            .populate("agent");
 
         res.status(200).json({
-            status: "success",
+            status: true,
             data: user,
-        });
-    }),
-
-    deleteMe: catchAsyncError(async (req, res, next) => {
-        const user = await User.findById(req.user._id);
-
-        if (!user) {
-            return next(new AppError("No user found", 404));
-        }
-
-        // Delete the user
-        await User.deleteOne({ _id: user._id });
-
-        res.status(200).json({
-            status: "success",
-            data: "User deleted successfully",
         });
     }),
 };

@@ -10,6 +10,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./utils/globalErrorHandler");
 
 const userRouter = require("./routes/userRouter");
+const farmerRouter = require("./routes/farmerRouter");
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -23,6 +24,7 @@ app.use(cors());
 app.use("/public", express.static("public"));
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/farmer", farmerRouter);
 
 app.get("/hello", async (req, res) => {
     try {

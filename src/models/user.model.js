@@ -6,7 +6,6 @@ const userSchema = new Schema(
     {
         name: {
             type: String,
-            required: [true, "Name cannot be empty."],
             minlength: [4, "Name must have minimum 4 characters"],
         },
         email: {
@@ -26,19 +25,24 @@ const userSchema = new Schema(
                 message: "Phone Number must have exactly 10 digits.",
             },
         },
-        admissionNumber: {
-            type: Number,
+        gender: {
+            type: String,
+            enum: ["male", "female", "other"],
         },
-        admissionYear: {
-            type: Number,
-        },
-        avatar: {
+        state: {
             type: String,
         },
         role: {
             type: String,
-            enum: ["user", "admin"],
-            default: "user",
+            enum: ["farmer", "agent"],
+            required: true,
+        },
+        agent: {
+            type: Schema.Types.ObjectId,
+            required: function () {
+                return this.role === "farmer";
+            },
+            ref: "User",
         },
         password: {
             type: String,
