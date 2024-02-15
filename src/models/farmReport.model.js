@@ -45,6 +45,6 @@ const farmReportSchema = new Schema(
     { timestamps: true }
 );
 
-const FarmReport = model("Farm", farmReportSchema);
+const FarmReport = model("FarmReport", farmReportSchema);
 
 module.exports = FarmReport;

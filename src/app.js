@@ -11,6 +11,7 @@ const globalErrorHandler = require("./utils/globalErrorHandler");
 
 const userRouter = require("./routes/userRouter");
 const farmerRouter = require("./routes/farmerRouter");
+const agentRouter = require("./routes/agentRouter");
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -25,6 +26,7 @@ app.use("/public", express.static("public"));
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/farmer", farmerRouter);
+app.use("/api/v1/agent", agentRouter);
 
 app.get("/hello", async (req, res) => {
     try {

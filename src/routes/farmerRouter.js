@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/transaction", authorize, farmerController.listTransactions);
 router.post("/farms", authorize, farmerController.listFarms);
 router.post("/reports", authorize, farmerController.listFarmReports);
+router.post("/farm/create", authorize, farmerController.createFarmData);
 router.patch("/farm/:id", authorize, farmerController.updateFarmData);
 router.post("/report/:id", authorize, farmerController.createFarmReport);
 

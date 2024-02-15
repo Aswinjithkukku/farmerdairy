@@ -7,11 +7,26 @@ const { farmerReportSubmitSchema } = require("../validations/farmer.schema");
 
 module.exports = {
     listFarms: catchAsyncError(async (req, res, next) => {
-        const farms = await Farm.find({ farmer: req.user._id });
+        const farms = await Farm.find({ farmer: req.user._id }).lean();
 
         res.status(200).json({
             status: "success",
             data: farms,
+        });
+    }),
+
+    createFarmData: catchAsyncError(async (req, res, next) => {
+        const { area } = req.body;
+
+        if (!area) {
+            return next(new AppError("Area of farm cannot be empty", 400));
+        }
+
+        const farm = await Farm.create({ area: area, farmer: req.user._id });
+
+        res.status(200).json({
+            status: "success",
+            data: farm,
         });
     }),
 
@@ -67,7 +82,9 @@ module.exports = {
         const reports = await FarmReport.find({
             farmer: req.user._id,
             farm: req.params.id,
-        }).sort("createdAt");
+        })
+            .sort("createdAt")
+            .lean();
 
         res.status(200).json({
             status: "success",
@@ -76,9 +93,9 @@ module.exports = {
     }),
 
     listTransactions: catchAsyncError(async (req, res, next) => {
-        const transaction = await Transaction.find({ farmer: req.user._id }).select(
-            "-__v -agent -farmer"
-        );
+        const transaction = await Transaction.find({ farmer: req.user._id })
+            .select("-__v -agent -farmer")
+            .lean();
 
         res.status(200).json({
             status: "success",
