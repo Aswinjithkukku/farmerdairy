@@ -7,7 +7,7 @@ const { farmerReportSubmitSchema } = require("../validations/farmer.schema");
 
 module.exports = {
     listFarms: catchAsyncError(async (req, res, next) => {
-        const farms = await Farm.find({ farmer: req.user._id }).lean();
+        const farms = await Farm.find({ farmer: req.user._id }).select("area").lean();
 
         res.status(200).json({
             status: "success",
@@ -43,9 +43,12 @@ module.exports = {
             {
                 new: true,
                 runValidators: true,
-                upsert: true,
             }
         );
+
+        if (!farm) {
+            return next(new AppError("The farm is not found", 404));
+        }
 
         res.status(200).json({
             status: "success",
@@ -66,7 +69,7 @@ module.exports = {
             ...req.body,
             farmer: req.user._id,
             farm: req.params.id,
-        }).populate("farmer farm");
+        }).then((rprt) => rprt.populate("farmer farm"));
 
         if (!report) {
             return next(new AppError("Creating record failed.", 500));
@@ -84,6 +87,15 @@ module.exports = {
             farm: req.params.id,
         })
             .sort("createdAt")
+            .populate({
+                path: "farmer",
+                select: "name email phoneNumber",
+            })
+            .populate({
+                path: "farm",
+                select: "area",
+            })
+            .select("-__v -updatedAt")
             .lean();
 
         res.status(200).json({
@@ -95,6 +107,10 @@ module.exports = {
     listTransactions: catchAsyncError(async (req, res, next) => {
         const transaction = await Transaction.find({ farmer: req.user._id })
             .select("-__v -agent -farmer")
+            .populate({
+                path: "farm",
+                select: "area",
+            })
             .lean();
 
         res.status(200).json({
