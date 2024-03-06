@@ -5,14 +5,17 @@ const messageSchema = new Schema(
         sender: {
             type: Schema.Types.ObjectId,
             ref: "User",
+            required: true,
         },
         content: {
             type: String,
             trim: true,
+            required: true,
         },
         chat: {
             type: Schema.Types.ObjectId,
             ref: "Chat",
+            required: true,
         },
         readBy: [
             {
