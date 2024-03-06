@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const Farm = require("../models/farm.model");
 const FarmReport = require("../models/farmReport.model");
 const Transaction = require("../models/transactions.model");
@@ -33,6 +34,10 @@ module.exports = {
     updateFarmData: catchAsyncError(async (req, res, next) => {
         const { area } = req.body;
 
+        if (!isValidObjectId(req.params.id)) {
+            return next(new AppError("Invalid Id. Please try again", 400));
+        }
+
         if (!area) {
             return next(new AppError("Area of farm cannot be empty", 400));
         }
@@ -59,6 +64,10 @@ module.exports = {
     createFarmReport: catchAsyncError(async (req, res, next) => {
         const { _, error } = farmerReportSubmitSchema.validate(req.body);
 
+        if (!isValidObjectId(req.params.id)) {
+            return next(new AppError("Invalid Id. Please try again", 400));
+        }
+
         if (error) {
             return next(
                 new AppError(error.details ? error?.details[0]?.message : error?.message, 400)
@@ -82,6 +91,11 @@ module.exports = {
     }),
 
     listFarmReports: catchAsyncError(async (req, res, next) => {
+
+        if (!isValidObjectId(req.params.id)) {
+            return next(new AppError("Invalid Id. Please try again", 400));
+        }
+
         const reports = await FarmReport.find({
             farmer: req.user._id,
             farm: req.params.id,

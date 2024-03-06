@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const FarmReport = require("../models/farmReport.model");
 const Transaction = require("../models/transactions.model");
 const AppError = require("../utils/appError");
@@ -6,6 +7,9 @@ const { createTransactionSchema } = require("../validations/agent.schema");
 
 module.exports = {
     getReportsToday: catchAsyncError(async (req, res, next) => {
+        if (!isValidObjectId(req.params.id)) {
+            return next(new AppError("Invalid Id. Please try again", 400));
+        }
         const today = new Date();
         const dayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
@@ -24,6 +28,10 @@ module.exports = {
         });
     }),
     acknowledgeReport: catchAsyncError(async (req, res, next) => {
+        if (!isValidObjectId(req.params.id)) {
+            return next(new AppError("Invalid Id. Please try again", 400));
+        }
+
         const report = await FarmReport.findByIdAndUpdate(
             req.params.id,
             { isAcknowledged: true },
