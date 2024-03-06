@@ -32,7 +32,7 @@ module.exports = {
         if (!chat) {
             chat = await Chat.create({
                 chatName: "sender",
-                users : [req.user._id, userId]
+                users: [req.user._id, userId],
             }).populate("users");
         }
 
@@ -40,6 +40,24 @@ module.exports = {
             status: "success",
             data: chat,
         });
+    }),
+
+    fetchChats: catchAsyncError(async (req, res, next) => {
+        Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+            .populate("users")
+            .populate("latestMessage")
+            .sort({ updatedAt: -1 })
+            .then(async (results) => {
+                results = await User.populate(results, {
+                    path: "latestMessage.sender",
+                    select: "name email phoneNumber",
+                });
+
+                res.status(200).json({
+                    status: "success",
+                    data: results,
+                });
+            });
     }),
 
     // Message controllers.

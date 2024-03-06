@@ -10,5 +10,6 @@ router
     .route("/me")
     .get(authorize, userController.myAccount)
     .patch(authorize, userController.updateUser);
+router.get("/", authorize, userController.fetchUsers);
 router.get("/agents/list", userController.listAgents);
 module.exports = router;

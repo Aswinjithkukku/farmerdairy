@@ -96,7 +96,7 @@ module.exports = {
 
     myAccount: catchAsyncError(async (req, res, next) => {
         // Finding the user with logged user id.
-        // populate agent means - if the user is farmer then there will be agent id with it. 
+        // populate agent means - if the user is farmer then there will be agent id with it.
         // with populate method we can make that id as the full details of that agent. similiar of leftjoin used in sequalise database.
         const user = await User.findById(req.user._id).populate("agent");
 
@@ -134,7 +134,7 @@ module.exports = {
             );
         }
 
-        // findByIdAndUpdate is the method . first argument should be id which we have to find from that table.  
+        // findByIdAndUpdate is the method . first argument should be id which we have to find from that table.
         // second argument should be the data to be updated and third would be additional options.
         //  new : true is added because to return back the updated data. else it return previous data before update affect.
         // runValidators is for checking all validation in the model are checked.
@@ -148,6 +148,23 @@ module.exports = {
         res.status(200).json({
             status: true,
             data: user,
+        });
+    }),
+
+    fetchUsers: catchAsyncError(async (req, res, next) => {
+        const keyword = req.query.search
+            ? {
+                  $or: [
+                      { name: { $regex: req.query.search, $options: "i" } },
+                      { email: { $regex: req.query.search, $options: "i" } },
+                  ],
+              }
+            : {};
+
+        const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+        res.status(200).json({
+            status: true,
+            data: users,
         });
     }),
 };
