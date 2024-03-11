@@ -5,8 +5,37 @@ const Transaction = require("../models/transactions.model");
 const AppError = require("../utils/appError");
 const catchAsyncError = require("../utils/catchAsyncError");
 const { farmerReportSubmitSchema } = require("../validations/farmer.schema");
+const User = require("../models/user.model");
 
 module.exports = {
+    fetchCoFarmersAndAgent: catchAsyncError(async (req, res, next) => {
+        const keyword = req.query.search
+            ? {
+                  $or: [
+                      { name: { $regex: req.query.search, $options: "i" } },
+                      { email: { $regex: req.query.search, $options: "i" } },
+                  ],
+              }
+            : {};
+
+        const users = await User.find({
+            $or: [
+                {
+                    _id: req.user.agent,
+                },
+                {
+                    _id: { $ne: req.user._id },
+                    agent: req.user.agent,
+                },
+            ],
+            ...keyword,
+        });
+
+        res.status(200).json({
+            status: true,
+            data: users,
+        });
+    }),
     listFarms: catchAsyncError(async (req, res, next) => {
         const farms = await Farm.find({ farmer: req.user._id }).select("area").lean();
 
@@ -91,7 +120,6 @@ module.exports = {
     }),
 
     listFarmReports: catchAsyncError(async (req, res, next) => {
-
         if (!isValidObjectId(req.params.id)) {
             return next(new AppError("Invalid Id. Please try again", 400));
         }

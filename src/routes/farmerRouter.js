@@ -10,5 +10,6 @@ router.get("/farms", authorize, farmerController.listFarms);
 router.patch("/farm/:id", authorize, farmerController.updateFarmData);
 router.post("/report/:id", authorize, farmerController.createFarmReport);
 router.get("/reports/:id", authorize, farmerController.listFarmReports);
+router.get("/chatusers", authorize, farmerController.fetchCoFarmersAndAgent);
 
 module.exports = router;

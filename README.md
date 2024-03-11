@@ -30,6 +30,7 @@ To run the project, use the following commands:
 {
     "role": "farmer",
     "email": "farmer@email.com",
+    "agent": "65ef5d294b0e3e165307ff80",
     "password": "1234",
     "confirmPassword": "1234"
 }
@@ -54,7 +55,7 @@ To run the project, use the following commands:
 }
 ```
 
-#### User Registration as Farmer
+#### User Registration as Agent
 
 -   **Endpoint:** `/api/v1/user/signup`
 -   **Method:** `POST`
@@ -144,7 +145,106 @@ To run the project, use the following commands:
 }
 ```
 
+
+#### Update User Data
+
+-   **Endpoint:** `/api/v1/user/me`
+-   **Method:** `PATCH`
+
+##### Request Body
+
+```json
+{
+    "name": "farmer",
+    "email": "farmer@email.com",
+    "phoneNumber": 9048904890,
+    "gender": "male",
+    "state": "kerala",
+    "area": "Nilambur"
+}
+```
+
+##### Expected Response
+
+```json
+{
+    "status": true,
+    "data": {
+        "_id": "65ef5ef6aeb241d4f2ee2229",
+        "email": "farmer@email.com",
+        "role": "farmer",
+        "agent": {
+            "_id": "65ef5d294b0e3e165307ff80",
+            "email": "agent@email.com",
+            "role": "agent",
+            "createdAt": "2024-03-11T19:36:09.294Z",
+            "updatedAt": "2024-03-11T19:36:09.294Z",
+            "__v": 0
+        },
+        "gender": "male",
+        "name": "John",
+        "phoneNumber": 9048904890,
+        "state": "kerala",
+        "area": "Nilambur"
+    }
+}
+```
+
+
+
+#### Fetch all user
+
+-   **Endpoint:** `/api/v1/user?search=farmer`
+-   **Method:** `GET`
+-   **Authorization:** `Bearer token.....`
+
+- if we give any query as search it will list the searched data of user. or it list all users found in this. includig agents and farmers otherthan ourself.
+
+##### Expected Response
+
+```json
+{
+    "status": "success",
+    "data": {
+        "_id": "65c9e42db3cb283683dd5687",
+        "email": "aswin@email.com",
+        "role": "agent",
+        "createdAt": "2024-02-12T09:26:05.921Z",
+        "updatedAt": "2024-02-12T09:26:05.921Z",
+        "__v": 0
+    }
+}
+```
+
+
+
 ### FARMER MODULE
+
+
+#### Fetch Co-Farmers and Agent for chats
+
+-   **Endpoint:** `/api/v1/farmer/chatusers?search=ww`
+-   **Method:** `GET`
+-   **Authorization:** `Bearer token.....`
+
+##### Expected Response
+
+```json
+{
+    "status": true,
+    "data": [
+        {
+            "_id": "65ef5d294b0e3e165307ff80",
+            "email": "aswin@email.com",
+            "role": "agent",
+            "createdAt": "2024-03-11T19:36:09.294Z",
+            "updatedAt": "2024-03-11T19:36:09.294Z",
+            "__v": 0
+        }
+    ]
+}
+```
+
 
 #### Create farm of Farmer
 
@@ -175,6 +275,36 @@ To run the project, use the following commands:
     }
 }
 ```
+
+
+#### Get List of farms
+
+-   **Endpoint:** `/api/v1/farmer/farms`
+-   **Method:** `GET`
+-   **Authorization:** `Bearer token.....`
+
+##### Expected Response
+
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "_id": "65cf3f238f4711888ce40418",
+            "area": "8 acre"
+        },
+        {
+            "_id": "65cf3f238f4711888ce40417",
+            "area": "9 acre"
+        },
+        {
+            "_id": "65d08e489e63917ebaec8a13",
+            "area": "10 acre"
+        }
+    ]
+}
+```
+
 
 #### Create Record of farm
 
@@ -272,35 +402,7 @@ To run the project, use the following commands:
 }
 ```
 
-#### Get List of farms
-
--   **Endpoint:** `/api/v1/farmer/farms`
--   **Method:** `GET`
--   **Authorization:** `Bearer token.....`
-
-##### Expected Response
-
-```json
-{
-    "status": "success",
-    "data": [
-        {
-            "_id": "65cf3f238f4711888ce40418",
-            "area": "8 acre"
-        },
-        {
-            "_id": "65cf3f238f4711888ce40417",
-            "area": "9 acre"
-        },
-        {
-            "_id": "65d08e489e63917ebaec8a13",
-            "area": "10 acre"
-        }
-    ]
-}
-```
-
-#### Get List of farms
+#### Get List of Transactions
 
 -   **Endpoint:** `/api/v1/farmer/transaction`
 -   **Method:** `GET`

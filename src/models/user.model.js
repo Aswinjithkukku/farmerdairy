@@ -32,6 +32,9 @@ const userSchema = new Schema(
         state: {
             type: String,
         },
+        area: {
+            type: String,
+        },
         role: {
             type: String,
             enum: ["farmer", "agent"],

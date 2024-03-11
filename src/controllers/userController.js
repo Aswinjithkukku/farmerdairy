@@ -49,6 +49,13 @@ module.exports = {
             );
         }
 
+        if (req.body.role === "farmer") {
+            const isAgent = await User.findOne({ role: "agent", _id: req.body.agent });
+            if (!isAgent) {
+                return next(new AppError("No agent found with this Id.", 404));
+            }
+        }
+
         // database operation. the data we pass are added to mongodb database.
         // User is table name &  create is a mongoose operation to add a data to user table.
         const user = await User.create(req.body);

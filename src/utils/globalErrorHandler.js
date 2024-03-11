@@ -54,30 +54,30 @@ const sendErrorProd = (err, res) => {
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
-    if (process.env.NODE_ENV === "development") {
-        sendErrorDev(err, res);
-    } else if (process.env.NODE_ENV === "production") {
-        let error = { ...err };
-        // handling cast error in db with unknown id
-        if (error.name === "CastError") {
-            error = handleCastError(error);
-        }
-        // handing duplicate field error in db
-        if (error.code === 11000) {
-            error = handleDuplicateFieldError(error);
-        }
-        // handling validation error in db
-        if (error.name === "ValidationError") {
-            error = handleValidationError(error);
-        }
-        // handling jwt error
-        if (error.name === "JsonWebTokenError") {
-            error = handleJwtError(error);
-        }
-        // handling jwt expiring error
-        if (error.name === "TokenExpiredError") {
-            error = handleJwtExpireError(error);
-        }
-        sendErrorProd(error, res);
-    }
+    // if (process.env.NODE_ENV === "development") {
+    sendErrorDev(err, res);
+    // } else if (process.env.NODE_ENV === "production") {
+    //     let error = { ...err };
+    //     // handling cast error in db with unknown id
+    //     if (error.name === "CastError") {
+    //         error = handleCastError(error);
+    //     }
+    //     // handing duplicate field error in db
+    //     if (error.code === 11000) {
+    //         error = handleDuplicateFieldError(error);
+    //     }
+    //     // handling validation error in db
+    //     if (error.name === "ValidationError") {
+    //         error = handleValidationError(error);
+    //     }
+    //     // handling jwt error
+    //     if (error.name === "JsonWebTokenError") {
+    //         error = handleJwtError(error);
+    //     }
+    //     // handling jwt expiring error
+    //     if (error.name === "TokenExpiredError") {
+    //         error = handleJwtExpireError(error);
+    //     }
+    //     sendErrorProd(error, res);
+    // }
 };
