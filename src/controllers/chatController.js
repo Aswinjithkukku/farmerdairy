@@ -98,7 +98,6 @@ module.exports = {
             path: "chat.users",
             select: "name email phoneNumber",
         });
-        console.log(message);
 
         await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
 
