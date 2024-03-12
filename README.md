@@ -629,7 +629,7 @@ To run the project, use the following commands:
 #### fetch chat
 
 -   **Endpoint:** `/api/v1/chat`
--   **Method:** `POST`
+-   **Method:** `GET`
 -   **Authorization:** `Bearer token.....`
 
 ##### Expected Response
