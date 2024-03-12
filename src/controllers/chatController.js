@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const Chat = require("../models/chatModel");
 const Message = require("../models/messageModel");
 const User = require("../models/user.model");
@@ -33,7 +34,7 @@ module.exports = {
             chat = await Chat.create({
                 chatName: "sender",
                 users: [req.user._id, userId],
-            }).populate("users");
+            }).then((data) => data.populate("users"));
         }
 
         res.status(200).json({
@@ -88,14 +89,16 @@ module.exports = {
             sender: req.user._id,
             content: content,
             chat: chatId,
-        }).then((msg) => {
-            msg.populate("sender", "name email phoneNumber").populate("chat");
         });
+
+        await message.populate("sender", "name email phoneNumber");
+        await message.populate("chat");
 
         message = await User.populate(message, {
             path: "chat.users",
             select: "name email phoneNumber",
         });
+        console.log(message);
 
         await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
 

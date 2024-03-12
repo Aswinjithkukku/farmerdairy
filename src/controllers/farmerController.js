@@ -19,16 +19,20 @@ module.exports = {
             : {};
 
         const users = await User.find({
-            $or: [
+            $and: [
                 {
-                    _id: req.user.agent,
+                    $or: [
+                        {
+                            _id: req.user.agent,
+                        },
+                        {
+                            _id: { $ne: req.user._id },
+                            agent: req.user.agent,
+                        },
+                    ],
                 },
-                {
-                    _id: { $ne: req.user._id },
-                    agent: req.user.agent,
-                },
+                keyword,
             ],
-            ...keyword,
         });
 
         res.status(200).json({
@@ -93,8 +97,14 @@ module.exports = {
     createFarmReport: catchAsyncError(async (req, res, next) => {
         const { _, error } = farmerReportSubmitSchema.validate(req.body);
 
-        if (!isValidObjectId(req.params.id)) {
+        if (!isValidObjectId(req.params.farmId)) {
             return next(new AppError("Invalid Id. Please try again", 400));
+        }
+
+        const isFarm = await Farm.findById(req.params.farmId);
+        
+        if (!isFarm) {
+            return next(new AppError("No farm found with provided ID", 400));
         }
 
         if (error) {
@@ -106,7 +116,7 @@ module.exports = {
         const report = await FarmReport.create({
             ...req.body,
             farmer: req.user._id,
-            farm: req.params.id,
+            farm: req.params.farmId,
         }).then((rprt) => rprt.populate("farmer farm"));
 
         if (!report) {

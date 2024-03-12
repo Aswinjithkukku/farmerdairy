@@ -28,14 +28,14 @@ module.exports = {
         });
     }),
     getReportsToday: catchAsyncError(async (req, res, next) => {
-        if (!isValidObjectId(req.params.id)) {
+        if (!isValidObjectId(req.params.farmerId)) {
             return next(new AppError("Invalid Id. Please try again", 400));
         }
         const today = new Date();
         const dayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
         const report = await FarmReport.findOne({
-            farmer: req.params.id,
+            farmer: req.params.farmerId,
             createdAt: { $gt: dayStart },
         }).lean();
 
@@ -49,12 +49,12 @@ module.exports = {
         });
     }),
     acknowledgeReport: catchAsyncError(async (req, res, next) => {
-        if (!isValidObjectId(req.params.id)) {
+        if (!isValidObjectId(req.params.reportId)) {
             return next(new AppError("Invalid Id. Please try again", 400));
         }
 
         const report = await FarmReport.findByIdAndUpdate(
-            req.params.id,
+            req.params.reportId,
             { isAcknowledged: true },
             {
                 new: true,
